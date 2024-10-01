@@ -18,3 +18,9 @@ export enum StorageMethod {
   supabase = "supabase",
   sqlite = "sqlite",
 }
+
+export interface StoredPdf {
+  id: string;
+  filename: string;
+  filedata: Blob;
+}

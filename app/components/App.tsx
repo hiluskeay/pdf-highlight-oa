@@ -58,7 +58,7 @@ export default function App() {
     );
     const pdf = res.data.pdf;
     if (pdf) {
-      // Update file url if OCR success
+      // Update file URL if OCR success
       const blob = new Blob([new Uint8Array(pdf)], { type: "application/pdf" });
       const fileOcrUrl = URL.createObjectURL(blob);
       setPdfOcrUrl(fileOcrUrl);
@@ -88,6 +88,13 @@ export default function App() {
     setPdfName(file.name);
     setPdfId(pdfId);
     setLoading(false);
+
+    // New functionality: Save PDF to storage
+    await fetch("/api/pdf/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pdfId, pdfName, pdfUrl: fileUrl }),
+    });
   };
 
   useEffect(() => {

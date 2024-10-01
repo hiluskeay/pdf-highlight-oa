@@ -1,7 +1,7 @@
 // app/utils/supabase.ts
 import { createClient } from "@supabase/supabase-js";
 import { supabaseKey, supabaseUrl } from "./env";
-import { StoredHighlight } from "./types";
+import { StoredHighlight, StoredPdf } from "./types"; // Assuming you have a type for PDF
 import fs from "fs";
 
 export const saveHighlight = async (highlight: StoredHighlight) => {
@@ -56,6 +56,29 @@ export const deleteHighlight = async (id: string) => {
   return null;
 };
 
+// Save PDF metadata
+export const savePdf = async (pdf: StoredPdf) => {
+  const supabaseClient = createClient(supabaseUrl, supabaseKey);
+  const { error } = await supabaseClient.from("pdfs").insert(pdf);
+  if (error) {
+    throw error;
+  }
+  return null;
+};
+
+// Delete a PDF by its ID
+export const deletePdf = async (id: string) => {
+  const supabaseClient = createClient(supabaseUrl, supabaseKey);
+  const { error } = await supabaseClient
+    .from("pdfs")
+    .delete()
+    .eq("id", id);
+  if (error) {
+    throw error;
+  }
+  return null;
+};
+
 // BONUS CHALLENGE: Implement a method to export highlights to a JSON file
 // async exportToJson(pdfId: string, filePath: string): Promise<void> {
 //   // Retrieve highlights and write to a JSON file
@@ -93,3 +116,4 @@ export const importFromJson = async (pdfId: string, filePath: string) => {
   });
   return null;
 };
+

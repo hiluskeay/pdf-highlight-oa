@@ -2,7 +2,9 @@
 
 import sqlite3 from "sqlite3";
 import path from "path";
-import { StoredHighlight } from "./types";
+import { StoredHighlight, StoredPdf } from "./types";
+import fs from 'fs';
+
 
 class SQLiteDatabase {
   private db: sqlite3.Database;
@@ -26,7 +28,7 @@ class SQLiteDatabase {
 
   private migrate(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const sql = `
+      const highlightTableSQL = `
         CREATE TABLE IF NOT EXISTS ${this.tableName} (
           id TEXT,
           pdfId TEXT,
@@ -43,12 +45,28 @@ class SQLiteDatabase {
           PRIMARY KEY (id, pdfId)
         )
       `;
-      this.db.run(sql, (err) => {
+      const pdfTableSQL = `
+        CREATE TABLE IF NOT EXISTS pdfs (
+          id TEXT PRIMARY Key,
+          filename TEXT, 
+          filedata BLOB 
+        )
+      `;
+      this.db.run(highlightTableSQL, (err) => {
         if (err) {
           console.error("Error creating table:", err.message);
           reject(err);
         } else {
           console.log("Highlights table created or already exists");
+          resolve();
+        }
+      });
+      this.db.run(pdfTableSQL, (pdfError) => {
+        if (pdfError) {
+          console.error("Error creating PDF table:", pdfError.message);
+          reject(pdfError);
+        } else {
+          console.log("PDF table created or already exists");
           resolve();
         }
       });
@@ -58,6 +76,65 @@ class SQLiteDatabase {
   private async ensureMigrated(): Promise<void> {
     await this.migrationPromise;
   }
+
+  private pdfToBase64(pdfPath: string): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        fs.readFile(pdfPath, (error, data) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+  private bufferToBase64(buffer: Buffer): string {
+    return buffer.toString('base64');
+  }
+  
+
+  async savePdf(pdfPath: string, id: string): Promise<void> {
+    await this.ensureMigrated();
+
+    const correctedPdfPath = pdfPath.replace(/__pdf$/, '.pdf');
+
+    const fileDataBuffer = await this.pdfToBase64(correctedPdfPath); 
+    const fileDataBase64 = this.bufferToBase64(fileDataBuffer); 
+
+    const sql = `INSERT OR REPLACE INTO pdfs (id, filename, filedata) VALUES (?, ?, ?)`;
+    return new Promise((resolve, reject) => {
+        this.db.run(sql, [id, path.basename(correctedPdfPath), fileDataBase64], (error) => {
+            if (error) reject(error);
+            else resolve();
+        });
+    });
+}
+
+  async getPdf(id: string): Promise<StoredPdf> {
+    await this.ensureMigrated();
+    const sql = `SELECT id, filename, filedata FROM pdfs WHERE id = ?`;
+
+    return new Promise((resolve, reject) => {
+        this.db.get(sql, [id], (error, row) => {
+            if (error) {
+                reject(error);
+            } else if (row) {
+                // Create a StoredPdf object
+                const storedPdf: StoredPdf = {
+                    id: row.id,
+                    filename: row.filename,
+                    filedata: Buffer.from(row.filedata, 'base64')
+                };
+                resolve(storedPdf);
+            } else {
+                reject(new Error("PDF not found"));
+            }
+        });
+    });
+}
+  
+  
 
   async saveHighlight(highlight: StoredHighlight): Promise<void> {
     await this.ensureMigrated();
