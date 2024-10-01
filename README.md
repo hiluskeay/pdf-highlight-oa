@@ -4,6 +4,28 @@
 
 This project is a PDF viewer and keyword search application developed as part of the Adanomad Tech Consulting Challenge. It allows users to upload PDF documents, view them in a web browser, search for keywords, and highlight matching text.
 
+## Challenge Notes - Hilus Keay
+
+I chose to upload the PDF into the database using sqlite locally.
+
+I based my implementation on the pre-existing Highlight database table.
+My experience in full stack development has been with Svelte, so all of what I implemented was learned in the process of doing, and so there's likely much room for improvement.
+
+This task reminded me very much of work I did for a previous co-op. It was at this previous co-op that I really developed my skill of "reverse engineering" a functioning product, to understand how it functions, and then use that understanding to implement new features.
+
+I started by doing a CTRL-shift-F for highlight, which quickly led me to the api/get and api/update, as well as the relevant calls in App.tsx, HighlightStorage.ts, sqliteUtils.ts, supabase.ts and types.ts. I spent around an hour looking through these functions to understand how they worked together, and taking notes on where a pdf feature would need to be. 
+
+After I felt I had a solid idea for my approach, I started writing my code.
+- I knew I needed to add some new things: pdf type,  pdfStorage.ts file, 
+- I also knew that I would need to add my SQLite code to the sqliteUtils file.
+    - This code would save and process the pdf files for saving to the database
+    - supabase would also have code for these calls.
+- App.tsx would call my apis
+
+Because I'm more familiar with svelte, it took a bit of time for me to debug and tweak my approach to work within Node (apparently FileReaders don't work within Node, but Buffers do, that took a bit of googling), but in the end I have the feature fully implemented!
+
+I thuroughly enjoyed this programming exercise, and if I had more time, I would do more research on refining the code I wrote, and would love to tackle the other features proposed.
+
 ## Features
 
 - PDF document upload and display
