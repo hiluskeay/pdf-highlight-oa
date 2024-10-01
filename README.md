@@ -22,9 +22,19 @@ After I felt I had a solid idea for my approach, I started writing my code.
     - supabase would also have code for these calls.
 - App.tsx would call my apis
 
-Because I'm more familiar with svelte, it took a bit of time for me to debug and tweak my approach to work within Node (apparently FileReaders don't work within Node, but Buffers do, that took a bit of googling), but in the end I have the feature fully implemented!
+Because I'm more familiar with svelte, it took a bit of time for me to debug and tweak my approach to work within Node (apparently FileReaders don't work within Node, but Buffers do, that took a bit of googling), but in the end I was able to get the feature implemented!
 
-I thuroughly enjoyed this programming exercise, and if I had more time, I would do more research on refining the code I wrote, and would love to tackle the other features proposed.
+***One Bug I was unable to solve before the submission time, was that my implementation only saves files to the database when they are in the project directory. ***
+
+***I did some more research into the problem I'm facing, and it turns out it's a limitation of my approach. From what I understand, I used Node's fs module to read the pdf data, but the browser can't provide fs with the full filepath it needs to work. I found a few different approaches online that would probably work better, and if I wasn't in school I'd invest the time implementing them before the deadline, because I thoroughly enjoyed this exercise. ***
+
+***I've decided to submit what I have, because I'm proud of how much of the new framework I was able to learn in the short period of time I used, and also that I was able to see the pdfs appear in my DB Browser application. ***
+
+***If this were a real task assigned to me on co-op, I would have continued to work at getting the feature to work, and tried the alternate approaches I found online, and if needed a few ideas I had myself (Formdata approach according to the internet, but I realized after that I could also have saved the images that the app makes anyway).  ***
+
+***Thank you again!***
+
+I thoroughly enjoyed this programming exercise, and if I had more time, I would do more research on refining the code I wrote, and would love to tackle the other features proposed.
 
 ## Features
 
